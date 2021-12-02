@@ -53,7 +53,7 @@ public class ExceptionController {
 	
 	@ExceptionHandler(Exception.class)
 	public String err(Model model) {
-		
+		//이러면 저거 안나옴
 		model.addAttribute("errorMsg", "숫자만 입력하세요");
 		return "chap13_exception/ExceptionExam";
 	}
