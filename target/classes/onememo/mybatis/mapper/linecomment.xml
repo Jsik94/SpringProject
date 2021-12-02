@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="onememo.mybatis.mapper.linecomment">
+
+	<!-- resultMap에 collection 사용시 -->
+
+	<select id="commentlistsUsingCollection" parameterType="Map"
+		resultType="lineCommentDTO">
+		SELECT l.*,m.name AS name
+		FROM members m JOIN linecomments l
+		ON m.id = l.id
+		WHERE no = #{no}
+		ORDER BY lno DESC
+	</select>
+
+	<!-- Ajax Code -->
+	<select id="commentListsUsingCollectionAjax" parameterType="Map"
+		resultType="Map">
+		SELECT l.*,m.name AS name
+		FROM members m JOIN linecomments l
+		ON m.id = l.id
+		WHERE no = #{no}
+		ORDER BY lno DESC
+	</select>
+
+	<!-- useGenerateKeys= -->
+
+	<insert id="commentInsert" parameterType="Map">
+		<!-- 오더가 쿼리 실행전인지 뒤인지를 확인함 keyProperty에 들어간 이름으로 parameterType에 넣어준다 타입은 
+			int로 ! -->
+		<selectKey keyProperty="lno" resultType="int" order="BEFORE">
+			SELECT SEQ_LINECOMMENTS_LNO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO linecomments
+		VALUES(SEQ_LINECOMMENTS_LNO.CURRVAL,#{linecomment},SYSDATE,#{no},#{id})
+	</insert>
+
+
+	<update id="commentUpdate" parameterType="Map">
+		UPDATE linecomments SET linecomment = #{linecomment} WHERE lno=#{lno}
+	</update>
+
+
+	   
+   <delete id="commentDelete" parameterType="Map" >
+   		DELETE linecomments WHERE lno = ${lno}
+   </delete>
+   
+   <delete id="commentDeleteByNo" parameterType="Map" >
+   		DELETE linecomments WHERE no = ${no}
+   </delete>
+
+
+</mapper>

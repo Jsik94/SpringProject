@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="onememo.mybatis.mapper.onememo">
+  <!-- 
+  <select id="selectBlog" resultType="Blog">
+    select * from Blog where id = #{id}
+  </select>
+  
+   -->
+   <!--
+	[쿼리문 작성법]
+	A. 값에 해당하는 부분은 #{변수}
+	B. 객체에 해당하는 부분은 ${변수} 객체은 테이블명 혹은 컬럼명등을 의미
+	C. #{변수} 작성시 parameterType이 Map인 경우는 키값을
+	                            자바빈(DTO계열)인 경우는 자바빈의 속성명(멤버변수명) 이어야 한다
+	     단,parameterType이 int나 String인 경우는 임의값을 줘도 무방
+	D. 쿼리문안에  >,>= ,<,<=등의 비교 연산자를 사용하는 경우 에러
+	ㅈㄴ중요함
+	  	1. <![CDATA[     ]]> CDATA섹션을 사용하거나
+	  		예]
+	  		SELECT * FROM emp
+	  		<![CDATA[
+	  		WHERE sal >= 3000
+	  		]]>
+	  		CDATA섹션의 문자열은 단순 텍스트로 처리한다
+	  	2. 특수문자를 사용한다 즉 >은 &gt; < 은 &lt;
+	  	   예]
+	  	  SELECT * FROM emp
+	  	  WHERE sal &gt;= 3000
+	 -->
+	 
+	 
+   <!-- SELECT 결과를 담을때 사용하는 애임 id 값으로 찾아씀  -->
+   <resultMap type="oneMemoDTO" id="oneMemoDTOResult">
+   <!-- 컬럼명엔 select결과의 컬럼명 과 dto의 속성명 -->
+   		<result column="no" property="no"/>
+   		<result column="title" property="title"/>
+   		<result column="content" property="content"/>
+   		<result column="postDate" property="postDate"/>
+   		<result column="id" property="id"/>
+   		<result column="name" property="name"/>
+   		<result column="commentCount" property="commentCount"/>
+   		<!-- 
+   			1:N관계 매핑용
+   			column : 조인할때의 FK  컬럼명
+   			select : 자식 테이블에서 조인한 상태에서 컬럼명으로 조회시 쿼리문 아이디[mapper파일id를 말하는 거임]
+   			javaType : DTO의 자식 레코드를 담을 컬렉션 타입
+   			ofType : 자식의 DTO 타입
+   		 -->
+   		 <collection property="comments" column="no" select="onememo.mybatis.mapper.linecomment.commentlistsUsingCollection" javaType="list" ofType="lineCommentDTO"/>
+   </resultMap>
+   
+   
+   
+   
+   
+   <!-- Map 빼고 다른클래스는 죄다 java부터 붙여야함 -->
+   <!-- id값에 dot(.)을 못쓴다 -->
+   <select id="memoIsLogin" parameterType="Map" resultType="int">
+   		SELECT COUNT(*) FROM MEMBERS WHERE id=#{id} AND pwd =#{pwd}
+   </select>
+   
+   <!-- 제네릭 키워드만 담아주면 알아서 컬렉션타입으로 추가함 -->
+   <!-- JSTL로 제어가능 단 el 사용은 X-->
+   <select id="memoSelectList" parameterType="Map" resultType="oneMemoDTO">
+   		SELECT * FROM 
+   				(SELECT T.*,ROWNUM R FROM 
+   						(SELECT o.*,m.name, (SELECT COUNT(*) FROM linecomments WHERE no = o.no ) AS commentCount 
+   							FROM onememo o join members m ON o.id=m.id
+   							<if test="searchWord !=null">
+   								WHERE ${searchColum} LIKE '%' || #{searchWord} || '%'
+   							</if>
+   							
+   							ORDER BY no DESC
+   							) T
+   				)
+   				WHERE R BETWEEN #{start} AND #{end}
+   </select>
+   
+   
+   
+   <select id="memoTotalRowCount" parameterType="Map" resultType="int">
+   		SELECT COUNT(*) FROM onememo o join members m ON o.id=m.id
+   		<if test="searchWord!=null">
+   			WHERE ${searchColum} LIKE '%' || #{searchWordl} || '%'
+   		</if>
+   </select>
+   
+   
+   <insert id="memoInsert" parameterType="Map">
+   		INSERT INTO onememo VALUES(SEQ_ONEMEMO_NO.NEXTVAL,#{title},#{content},SYSDATE,#{id})
+
+   </insert>
+   
+   <!-- ResultMap은 이렇게 매핑한다. -->
+   <select id="memoSelectOne" parameterType="Map" resultMap="oneMemoDTOResult">
+   		SELECT o.*,m.name AS name FROM onememo o JOIN members m ON  o.id = m.id WHERE no = #{no}
+   </select>
+   
+      
+   <select id="memoFindNameById" parameterType="String" resultType="String">
+   		SELECT name FROM members WHERE id = #{id}
+   </select>
+
+  
+  
+   <update id="onememoUpdate" parameterType="Map">
+   		UPDATE onememo SET title =#{title} , content =#{content} WHERE no=#{no}
+   </update>
+   	   
+   
+   
+  
+   <delete id="memoDeleteByNo" parameterType="Map">
+   		DELETE onememo WHERE no = #{no}
+   </delete>
+  
+</mapper>

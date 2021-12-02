@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- https://mybatis.org/mybatis-3/ko/index.html -->
+<!-- mybatis 환경설정파일 1] 데이터베이스 연결정보 설정 2] 매퍼파일의 위치정보 설정 -->
+<configuration>
+
+	<!-- 마이바티스에서 프로퍼티 파일을 사용할때 ex 계정정보 properties 태그가 반드시 typeAliases보다 위에 위치해야됨 -->
+
+	<!--  커넥션풀로인한 삭제
+	<properties resource="onememo/resources/connect.properties" />
+	-->
+	<!-- typeAliases 타입별칭태그 이거 안쓰면 패키지명까지 싹다 적어야함 -->
+	<!-- Alias Area -->
+	<typeAliases>
+		<typeAlias type="com.kosmo.springapp.onememo.service.OneMemoDTO" alias ="oneMemoDTO"/>
+		<typeAlias type="com.kosmo.springapp.onememo.service.LineCommentDTO" alias ="lineCommentDTO"/>
+		<!-- LineCommentDTO는 별칭 안할꺼임 MAP으로 할끄니까! -->
+	</typeAliases>
+	
+	<!-- DB set Configuration -->
+
+<!-- 커넥션풀로인한 삭제
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+ -->
+			<!--  mybatis-spring-2.x.jar API 사용하여 연결시 필요가없음 ㄱㅇㄷ -->
+			<!--  이부분을 기재햇다는 것은 커넥션풀이아니라는거임 -->
+		<!-- 
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url"
+					value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+			 -->
+			<!-- 커넥션 풀사용 -->
+			<!-- 커넥션풀로인한 삭제
+			 <dataSource type="JNDI"> 
+			 -->
+				<!-- 반드시 name은 data_source 로 해야됨 프레임워크 내부 변수명임 -->
+<!-- 커넥션풀로인한 삭제
+				<property name="data_source" value="${JNDI_NAME}"/>
+			</dataSource>
+			
+		</environment>
+	</environments>
+ -->	
+	<!-- mapper file location -->
+	<mappers>
+		<mapper resource="/onememo/mybatis/mapper/onememo.xml" />
+		<mapper resource="/onememo/mybatis/mapper/linecomment.xml" />
+		<mapper resource="/onememo/mybatis/mapper/dynamicsql.xml" />
+	</mappers>
+</configuration>
